@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WinUI App - Fluent Design</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --red-primary: #E81123;
+      --red-dark: #A4373A;
+      --dark-bg: #1F1F1F;
+      --dark-surface: #2B2B2B;
+      --dark-surface-alt: #323232;
+      --text-primary: #FFFFFF;
+      --text-secondary: #B4B4B4;
+      --border: rgba(255, 255, 255, 0.08);
+    }
+
+    html, body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
+      background-color: var(--dark-bg);
+      color: var(--text-primary);
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    /* ========== AUTH SCREEN ========== */
+    .auth-screen {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+      background-color: var(--dark-bg);
+    }
+
+    .auth-card {
+      width: 100%;
+      max-width: 380px;
+      padding: 40px;
+      background-color: var(--dark-surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .auth-card h1 {
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 32px;
+      text-align: center;
+    }
+
+    .form-field {
+      margin-bottom: 20px;
+    }
+
+    .form-field label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+    }
+
+    .form-field input {
+      width: 100%;
+      padding: 10px 12px;
+      background-color: var(--dark-surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-primary);
+      font-size: 13px;
+      transition: all 0.15s ease;
+    }
+
+    .form-field input:focus {
+      outline: none;
+      border-color: var(--red-primary);
+      background-color: rgba(232, 17, 35, 0.05);
+      box-shadow: 0 0 0 2px rgba(232, 17, 35, 0.1);
+    }
+
+    .form-field input::placeholder {
+      color: var(--text-secondary);
+    }
+
+    .checkbox-field {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      font-size: 13px;
+    }
+
+    .checkbox-field input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--red-primary);
+      cursor: pointer;
+    }
+
+    .checkbox-field label {
+      margin: 0;
+      cursor: pointer;
+      color: var(--text-secondary);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 10px 16px;
+      background-color: var(--red-primary);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn:hover {
+      background-color: var(--red-dark);
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .auth-footer {
+      text-align: center;
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .auth-footer a {
+      color: var(--red-primary);
+      text-decoration: none;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .auth-footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* ========== MAIN APP ========== */
+    .app-container {
+      display: none;
+      width: 100%;
+      height: 100%;
+      flex-direction: column;
+    }
+
+    .app-container.active {
+      display: flex;
+    }
+
+    /* Command Bar */
+    .command-bar {
+      height: 48px;
+      background-color: var(--dark-surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 16px;
+      flex-shrink: 0;
+      z-index: 100;
+    }
+
+    .menu-button {
+      width: 40px;
+      height: 40px;
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      transition: background-color 0.15s ease;
+    }
+
+    .menu-button:hover {
+      background-color: rgba(232, 17, 35, 0.1);
+    }
+
+    .command-bar-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    /* Main Layout */
+    .main-layout {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* Navigation View */
+    .nav-view {
+      width: 0;
+      background-color: var(--dark-surface);
+      border-right: 1px solid var(--border);
+      overflow: hidden;
+      transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 99;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .nav-view.expanded {
+      width: 280px;
+    }
+
+    .nav-header {
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .nav-title {
+      font-size: 14px;
+      font-weight: 600;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .nav-view.expanded .nav-title {
+      opacity: 1;
+    }
+
+    .nav-close-btn {
+      width: 32px;
+      height: 32px;
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      opacity: 0;
+      transition: all 0.15s ease;
+    }
+
+    .nav-view.expanded .nav-close-btn {
+      opacity: 1;
+    }
+
+    .nav-close-btn:hover {
+      background-color: rgba(232, 17, 35, 0.1);
+    }
+
+    .nav-menu {
+      flex: 1;
+      list-style: none;
+      padding: 8px 4px;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .nav-item {
+      height: 40px;
+      margin: 4px 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 12px;
+      color: var(--text-primary);
+      text-decoration: none;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background-color 0.15s ease;
+      position: relative;
+      font-size: 13px;
+    }
+
+    .nav-item:hover {
+      background-color: rgba(232, 17, 35, 0.08);
+    }
+
+    .nav-item.active {
+      background-color: rgba(232, 17, 35, 0.15);
+      color: var(--red-primary);
+      font-weight: 600;
+    }
+
+    .nav-item.active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 8px;
+      bottom: 8px;
+      width: 3px;
+      background-color: var(--red-primary);
+      border-radius: 0 2px 2px 0;
+    }
+
+    .nav-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .nav-label {
+      opacity: 0;
+      transition: opacity 0.15s ease;
+      white-space: nowrap;
+      flex: 1;
+    }
+
+    .nav-view.expanded .nav-label {
+      opacity: 1;
+    }
+
+    .nav-footer {
+      padding: 8px 4px;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    /* Content Area */
+    .content-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .page-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 32px 40px;
+    }
+
+    .page {
+      display: none;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .page-title {
+      font-size: 32px;
+      font-weight: 600;
+      margin-bottom: 24px;
+      color: var(--text-primary);
+    }
+
+    /* Cards */
+    .card {
+      background-color: var(--dark-surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 16px;
+      transition: all 0.2s ease;
+    }
+
+    .card:hover {
+      border-color: rgba(232, 17, 35, 0.3);
+      box-shadow: 0 4px 16px rgba(232, 17, 35, 0.1);
+    }
+
+    .card h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--text-primary);
+    }
+
+    .card p {
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--text-secondary);
+    }
+
+    /* Tables */
+    .table-wrapper {
+      background-color: var(--dark-surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    thead tr {
+      background-color: rgba(232, 17, 35, 0.08);
+      border-bottom: 2px solid var(--border);
+    }
+
+    th {
+      padding: 12px 16px;
+      text-align: right;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+
+    tbody tr:hover {
+      background-color: rgba(232, 17, 35, 0.05);
+    }
+
+    /* Profile Section */
+    .profile-section {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--red-primary), var(--red-dark));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 32px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .profile-info h2 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: var(--text-primary);
+    }
+
+    .profile-info p {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* Theme Buttons */
+    .theme-buttons {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .theme-btn {
+      padding: 8px 16px;
+      background-color: rgba(232, 17, 35, 0.1);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-primary);
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.15s ease;
+    }
+
+    .theme-btn:hover {
+      background-color: rgba(232, 17, 35, 0.15);
+    }
+
+    /* Overlay */
+    .nav-overlay {
+      display: none;
+      position: fixed;
+      top: 48px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 98;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    .nav-overlay.show {
+      display: block;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(232, 17, 35, 0.4);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(232, 17, 35, 0.6);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .command-bar {
+        height: 56px;
+        padding: 0 12px;
+      }
+
+      .menu-button {
+        width: 44px;
+        height: 44px;
+      }
+
+      .page-container {
+        padding: 20px;
+      }
+
+      .page-title {
+        font-size: 24px;
+      }
+
+      .card {
+        padding: 16px;
+      }
+
+      .nav-view {
+        position: fixed;
+        top: 56px;
+        right: 0;
+        height: calc(100vh - 56px);
+        box-shadow: -2px 0 8px rgba(0, 0, 0, 0.3);
+      }
+
+      .nav-view.expanded {
+        width: 260px;
+      }
+
+      .nav-overlay {
+        top: 56px;
+      }
+
+      .profile-section {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .avatar {
+        width: 64px;
+        height: 64px;
+        font-size: 28px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .page-title {
+        font-size: 20px;
+      }
+
+      .card {
+        padding: 12px;
+      }
+
+      .page-container {
+        padding: 16px;
+      }
+
+      .nav-view.expanded {
+        width: 100%;
+      }
+
+      th, td {
+        padding: 10px 12px;
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Auth Screen -->
+<div class="auth-screen" id="authScreen">
+  <!-- Login Form -->
+  <div class="auth-card" id="loginForm">
+    <h1>تسجيل الدخول</h1>
+    <div class="form-field">
+      <label>البريد الإلكتروني</label>
+      <input type="email" id="loginEmail" placeholder="example@mail.com">
+    </div>
+    <div class="form-field">
+      <label>كلمة المرور</label>
+      <input type="password" id="loginPassword" placeholder="••••••••">
+    </div>
+    <div class="checkbox-field">
+      <input type="checkbox" id="rememberMe">
+      <label for="rememberMe">تذكرني</label>
+    </div>
+    <button class="btn" onclick="handleLogin()">دخول</button>
+    <div class="auth-footer">
+      ليس لديك حساب؟ <a onclick="switchToRegister()">إنشاء حساب</a>
+    </div>
+  </div>
+
+  <!-- Register Form -->
+  <div class="auth-card" id="registerForm" style="display: none;">
+    <h1>إنشاء حساب جديد</h1>
+    <div class="form-field">
+      <label>الاسم الكامل</label>
+      <input type="text" id="registerName" placeholder="أدخل اسمك">
+    </div>
+    <div class="form-field">
+      <label>البريد الإلكتروني</label>
+      <input type="email" id="registerEmail" placeholder="example@mail.com">
+    </div>
+    <div class="form-field">
+      <label>كلمة المرور</label>
+      <input type="password" id="registerPassword" placeholder="••••••••">
+    </div>
+    <button class="btn" onclick="handleRegister()">إنشاء الحساب</button>
+    <div class="auth-footer">
+      لديك حساب بالفعل؟ <a onclick="switchToLogin()">تسجيل الدخول</a>
+    </div>
+  </div>
+</div>
+
+<!-- Main App -->
+<div class="app-container" id="appContainer">
+  <!-- Command Bar -->
+  <div class="command-bar">
+    <button class="menu-button" onclick="toggleNav()" title="القائمة">
+      <i class="fas fa-bars"></i>
+    </button>
+    <span class="command-bar-title">تطبيقك</span>
+  </div>
+
+  <!-- Main Layout -->
+  <div class="main-layout">
+    <!-- Navigation View -->
+    <nav class="nav-view" id="navView">
+      <div class="nav-header">
+        <span class="nav-title">القائمة</span>
+        <button class="nav-close-btn" onclick="toggleNav()" title="إغلاق">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <ul class="nav-menu">
+        <li><a class="nav-item active" onclick="showPage(event, 'home')">
+          <div class="nav-icon"><i class="fas fa-home"></i></div>
+          <span class="nav-label">الرئيسية</span>
+        </a></li>
+        <li><a class="nav-item" onclick="showPage(event, 'profile')">
+          <div class="nav-icon"><i class="fas fa-user"></i></div>
+          <span class="nav-label">الملف الشخصي</span>
+        </a></li>
+        <li><a class="nav-item" onclick="showPage(event, 'settings')">
+          <div class="nav-icon"><i class="fas fa-cog"></i></div>
+          <span class="nav-label">الإعدادات</span>
+        </a></li>
+      </ul>
+      <div class="nav-footer">
+        <a class="nav-item" onclick="handleLogout(event)">
+          <div class="nav-icon"><i class="fas fa-sign-out-alt"></i></div>
+          <span class="nav-label">تسجيل الخروج</span>
+        </a>
+      </div>
+    </nav>
+
+    <!-- Overlay -->
+    <div class="nav-overlay" id="navOverlay" onclick="toggleNav()"></div>
+
+    <!-- Content Area -->
+    <div class="content-area">
+      <div class="page-container">
+        <!-- Home Page -->
+        <div class="page active" id="homePage">
+          <h1 class="page-title">لوحة التحكم</h1>
+          <div class="card">
+            <h3>أهلاً بك في تطبيقك الجديد</h3>
+            <p>تم تحسين الواجهة لتتوافق مع معايير Fluent UI من مايكروسوفت. استمتع بتجربة مستخدم سلسة وعصرية.</p>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>النشاط</th>
+                  <th>التاريخ</th>
+                  <th>الحالة</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>تسجيل دخول جديد</td>
+                  <td>2024-05-20</td>
+                  <td><span style="color: #4caf50;">ناجح</span></td>
+                </tr>
+                <tr>
+                  <td>تحديث الملف الشخصي</td>
+                  <td>2024-05-19</td>
+                  <td><span style="color: #4caf50;">ناجح</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Profile Page -->
+        <div class="page" id="profilePage">
+          <h1 class="page-title">الملف الشخصي</h1>
+          <div class="card">
+            <div class="profile-section">
+              <div class="avatar" id="userAvatar">U</div>
+              <div class="profile-info">
+                <h2 id="userName">اسم المستخدم</h2>
+                <p id="userEmail">user@example.com</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Settings Page -->
+        <div class="page" id="settingsPage">
+          <h1 class="page-title">الإعدادات</h1>
+          <div class="card">
+            <h3>المظهر</h3>
+            <div class="theme-buttons">
+              <button class="theme-btn" onclick="setTheme('light')">فاتح</button>
+              <button class="theme-btn" onclick="setTheme('dark')">داكن</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ============ User Session Manager ============
+  const SessionManager = {
+    userKey: 'appUser',
+    sessionKey: 'appSession',
+
+    saveUser(name, email) {
+      localStorage.setItem(this.userKey, JSON.stringify({ name, email }));
+      sessionStorage.setItem(this.sessionKey, 'active');
+    },
+
+    getUser() {
+      const data = localStorage.getItem(this.userKey);
+      return data ? JSON.parse(data) : null;
+    },
+
+    isSessionActive() {
+      return sessionStorage.getItem(this.sessionKey) === 'active';
+    },
+
+    logout() {
+      localStorage.removeItem(this.userKey);
+      sessionStorage.removeItem(this.sessionKey);
+    }
+  };
+
+  // ============ Navigation ============
+  function toggleNav() {
+    const nav = document.getElementById('navView');
+    const overlay = document.getElementById('navOverlay');
+    nav.classList.toggle('expanded');
+    overlay.classList.toggle('show');
+  }
+
+  function closeNav() {
+    const nav = document.getElementById('navView');
+    const overlay = document.getElementById('navOverlay');
+    nav.classList.remove('expanded');
+    overlay.classList.remove('show');
+  }
+
+  document.addEventListener('click', (e) => {
+    const nav = document.getElementById('navView');
+    const menuBtn = document.querySelector('.menu-button');
+    if (nav.classList.contains('expanded') && 
+        !nav.contains(e.target) && 
+        !menuBtn.contains(e.target) &&
+        window.innerWidth > 768) {
+      closeNav();
+    }
+  });
+
+  // ============ Page Navigation ============
+  function showPage(event, pageId) {
+    event.preventDefault();
+    
+    // Hide all pages
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(pageId + 'Page').classList.add('active');
+    
+    // Update nav items
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    event.target.closest('.nav-item').classList.add('active');
+    
+    // Close nav on mobile
+    if (window.innerWidth <= 768) {
+      closeNav();
+    }
+  }
+
+  // ============ Auth ============
+  function switchToRegister() {
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('registerForm').style.display = 'block';
+  }
+
+  function switchToLogin() {
+    document.getElementById('loginForm').style.display = 'block';
+    document.getElementById('registerForm').style.display = 'none';
+  }
+
+  function handleLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value.trim();
+
+    if (!email || !password) {
+      alert('يرجى ملء جميع الحقول');
+      return;
+    }
+
+    const name = email.split('@')[0];
+    SessionManager.saveUser(name, email);
+    showApp();
+    updateProfile();
+  }
+
+  function handleRegister() {
+    const name = document.getElementById('registerName').value.trim();
+    const email = document.getElementById('registerEmail').value.trim();
+    const password = document.getElementById('registerPassword').value.trim();
+
+    if (!name || !email || !password) {
+      alert('يرجى ملء جميع الحقول');
+      return;
+    }
+
+    SessionManager.saveUser(name, email);
+    showApp();
+    updateProfile();
+  }
+
+  function handleLogout(event) {
+    event.preventDefault();
+    SessionManager.logout();
+    document.getElementById('authScreen').style.display = 'flex';
+    document.getElementById('appContainer').classList.remove('active');
+    document.getElementById('loginForm').style.display = 'block';
+    document.getElementById('registerForm').style.display = 'none';
+    closeNav();
+  }
+
+  // ============ UI Updates ============
+  function updateProfile() {
+    const user = SessionManager.getUser();
+    if (user) {
+      const firstName = user.name.split(' ')[0];
+      const letter = firstName.charAt(0).toUpperCase();
+      document.getElementById('userName').textContent = user.name;
+      document.getElementById('userEmail').textContent = user.email;
+      document.getElementById('userAvatar').textContent = letter;
+    }
+  }
+
+  function showApp() {
+    document.getElementById('authScreen').style.display = 'none';
+    document.getElementById('appContainer').classList.add('active');
+  }
+
+  function setTheme(theme) {
+    // Theme switching logic here
+    console.log('Theme set to:', theme);
+  }
+
+  // ============ Init ============
+  window.addEventListener('load', () => {
+    const user = SessionManager.getUser();
+    if (user && SessionManager.isSessionActive()) {
+      showApp();
+      updateProfile();
+    }
+  });
+</script>
+
+</body>
+</html>
