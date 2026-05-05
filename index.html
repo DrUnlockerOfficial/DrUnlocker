@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Signup</title>
+  <style>
+    :root{
+      --bg: #0f0f10;
+      --panel: rgba(28, 28, 30, 0.88);
+      --panel-2: rgba(37, 37, 40, 0.88);
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #f4f4f5;
+      --muted: #b7b7bd;
+      --accent: #e5484d;
+      --accent-hover: #ff5b61;
+      --accent-press: #bf2f35;
+      --input-bg: rgba(255, 255, 255, 0.06);
+      --input-border: rgba(255, 255, 255, 0.10);
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.38);
+      --radius: 18px;
+    }
+
+    *{
+      box-sizing:border-box;
+    }
+
+    body{
+      margin:0;
+      padding:24px;
+      font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(229,72,77,0.16), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(229,72,77,0.08), transparent 22%),
+        linear-gradient(180deg, #111113 0%, #0b0b0c 100%);
+      color:var(--text);
+      direction:rtl;
+      min-height:100vh;
+    }
+
+    .card{
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:18px;
+      margin-bottom:16px;
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .topbar{
+      display:flex;
+      gap:10px;
+      margin-bottom:16px;
+      flex-wrap:wrap;
+    }
+
+    .tab-btn{
+      border:1px solid rgba(255,255,255,0.08);
+      background:linear-gradient(180deg, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.05) 100%);
+      color:var(--text);
+      padding:12px 16px;
+      border-radius:14px;
+      cursor:pointer;
+      font-size:15px;
+      font-weight:600;
+      transition: transform .14s ease, filter .14s ease, background .14s ease;
+      box-shadow:none;
+      margin:0;
+    }
+
+    .tab-btn:hover{
+      filter:brightness(1.05);
+      transform:translateY(-1px);
+    }
+
+    .tab-btn.active{
+      background:linear-gradient(180deg, var(--accent) 0%, var(--accent-press) 100%);
+      box-shadow:0 10px 24px rgba(229,72,77,.22);
+    }
+
+    label{
+      display:block;
+      margin:12px 0 6px;
+      font-weight:600;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    input{
+      width:100%;
+      padding:12px 14px;
+      border-radius:14px;
+      border:1px solid var(--input-border);
+      background:var(--input-bg);
+      color:var(--text);
+      outline:none;
+      font-size:15px;
+      transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+
+    input::placeholder{
+      color:#8f8f97;
+    }
+
+    input:focus{
+      border-color:rgba(229,72,77,.75);
+      box-shadow:0 0 0 4px rgba(229,72,77,.14);
+      background:rgba(255,255,255,0.08);
+    }
+
+    input[readonly]{
+      opacity:0.92;
+      cursor:not-allowed;
+    }
+
+    button.action-btn{
+      border:1px solid rgba(255,255,255,0.08);
+      background:linear-gradient(180deg, var(--accent) 0%, var(--accent-press) 100%);
+      color:#fff;
+      padding:12px 16px;
+      border-radius:14px;
+      cursor:pointer;
+      font-size:15px;
+      font-weight:600;
+      margin-top:14px;
+      margin-inline-end:8px;
+      box-shadow:0 10px 24px rgba(229,72,77,.22);
+      transition: transform .14s ease, filter .14s ease, background .14s ease;
+    }
+
+    button.action-btn:hover{
+      filter:brightness(1.05);
+      transform:translateY(-1px);
+    }
+
+    button.action-btn:active{
+      transform:translateY(0);
+      filter:brightness(.96);
+    }
+
+    .row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+
+    .hidden{
+      display:none !important;
+    }
+
+    .output-card{
+      display:none;
+    }
+
+    @media (max-width: 720px){
+      body{
+        padding:16px;
+      }
+
+      .row{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <button id="tabSignup" class="tab-btn active" type="button">Signup</button>
+    <button id="tabSignin" class="tab-btn" type="button">SignIn</button>
+  </div>
+
+  <div id="signupView" class="card">
+    <label>Full Name</label>
+    <input id="userKey" placeholder="Enter full name" />
+
+    <label>Username</label>
+    <input id="username" placeholder="Generated automatically" readonly />
+
+    <label>Email Address</label>
+    <input id="email" placeholder="Enter email address" />
+
+    <label>Password</label>
+    <input id="password" type="password" placeholder="Enter password" />
+
+    <button id="saveAllBtn" class="action-btn" type="button">Signup</button>
+  </div>
+
+  <div id="signinView" class="card hidden">
+    <label>Email Address</label>
+    <input id="signinEmail" placeholder="Enter email address" />
+
+    <label>Password</label>
+    <input id="signinPassword" type="password" placeholder="Enter password" />
+
+    <button id="signinBtn" class="action-btn" type="button">SignIn</button>
+  </div>
+
+  <div class="card output-card">
+    <pre id="output">جاهز...</pre>
+  </div>
+
+  <script type="module">
+    const output = document.getElementById("output");
+
+    function appendLog(message) {
+      const current = output.textContent.trim();
+      output.textContent = current === "جاهز..." || current === "" ? message : current + "\n" + message;
+      console.log(message);
+    }
+
+    window.addEventListener("error", (e) => {
+      appendLog("Window error: " + (e.error?.message || e.message || "unknown"));
+    });
+
+    window.addEventListener("unhandledrejection", (e) => {
+      appendLog("Unhandled rejection: " + (e.reason?.message || e.reason || "unknown"));
+    });
+
+    appendLog("JS loaded");
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCwAX2A35nYps1T4f30_lurNh_7SzL8by8",
+      authDomain: "dr-unlocker.firebaseapp.com",
+      projectId: "dr-unlocker",
+      storageBucket: "dr-unlocker.firebasestorage.app",
+      messagingSenderId: "783882145882",
+      appId: "1:783882145882:web:64f34098b501f6e9da8863",
+      measurementId: "G-HTC5C0F929",
+      databaseURL: "https://dr-unlocker-default-rtdb.firebaseio.com/"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    function safeKey(key) {
+      return String(key || "").trim().replace(/[.#$\[\]\/]/g, "_");
+    }
+
+    function normalizeUsername(name) {
+      return String(name || "").trim().toLowerCase().replace(/\s+/g, "");
+    }
+
+    function formatDateEnglish(timestamp) {
+      return new Date(timestamp).toLocaleString("en-US", {
+        dateStyle: "full",
+        timeStyle: "medium"
+      });
+    }
+
+    function getSignupData() {
+      const fullName = document.getElementById("userKey").value.trim();
+      const username = normalizeUsername(fullName);
+
+      return {
+        userKey: safeKey(fullName),
+        fullName,
+        username,
+        email: document.getElementById("email").value.trim(),
+        password: document.getElementById("password").value,
+        accountStatus: "Idle"
+      };
+    }
+
+    function getSigninData() {
+      return {
+        email: document.getElementById("signinEmail").value.trim(),
+        password: document.getElementById("signinPassword").value
+      };
+    }
+
+    function syncUsername() {
+      const fullName = document.getElementById("userKey").value;
+      document.getElementById("username").value = normalizeUsername(fullName);
+    }
+
+    document.getElementById("userKey").addEventListener("input", syncUsername);
+    syncUsername();
+
+    const signupView = document.getElementById("signupView");
+    const signinView = document.getElementById("signinView");
+    const tabSignup = document.getElementById("tabSignup");
+    const tabSignin = document.getElementById("tabSignin");
+
+    function showSignup() {
+      signupView.classList.remove("hidden");
+      signinView.classList.add("hidden");
+      tabSignup.classList.add("active");
+      tabSignin.classList.remove("active");
+    }
+
+    function showSignin() {
+      signupView.classList.add("hidden");
+      signinView.classList.remove("hidden");
+      tabSignup.classList.remove("active");
+      tabSignin.classList.add("active");
+    }
+
+    tabSignup.addEventListener("click", showSignup);
+    tabSignin.addEventListener("click", showSignin);
+
+    async function saveToRealtimeDatabase() {
+      const { userKey, username, email, accountStatus } = getSignupData();
+
+      if (!userKey) {
+        throw new Error("Full Name is empty");
+      }
+
+      const payload = {
+        username,
+        email,
+        balance: 0,
+        registeredAt: formatDateEnglish(Date.now()),
+        accountStatus
+      };
+
+      appendLog("RTDB: start writing...");
+      await set(ref(db, "users/" + userKey), payload);
+      appendLog("RTDB: saved to users/" + userKey);
+    }
+
+    async function saveToAuth() {
+      const { username, email, password } = getSignupData();
+
+      if (!email || !password) {
+        throw new Error("Email and Password are required for Auth");
+      }
+
+      appendLog("Auth: loading module...");
+      const authModule = await import("https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js");
+      const { getAuth, createUserWithEmailAndPassword, updateProfile } = authModule;
+
+      const auth = getAuth(app);
+
+      appendLog("Auth: creating user...");
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+
+      await updateProfile(cred.user, {
+        displayName: username || email.split("@")[0]
+      });
+
+      appendLog("Auth: created user " + cred.user.uid);
+    }
+
+    async function signInUser() {
+      const { email, password } = getSigninData();
+
+      if (!email || !password) {
+        throw new Error("Email and Password are required for SignIn");
+      }
+
+      appendLog("SignIn: loading module...");
+      const authModule = await import("https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js");
+      const { getAuth, signInWithEmailAndPassword } = authModule;
+
+      const auth = getAuth(app);
+
+      appendLog("SignIn: signing in...");
+      const cred = await signInWithEmailAndPassword(auth, email, password);
+
+      appendLog("SignIn: signed in " + cred.user.uid);
+      window.location.href = "home.html";
+    }
+
+    document.getElementById("saveAllBtn").addEventListener("click", async () => {
+      appendLog("-----");
+      appendLog("بدأ الحفظ...");
+
+      try {
+        await saveToRealtimeDatabase();
+      } catch (error) {
+        appendLog("RTDB failed: " + (error.code || "") + " " + (error.message || error));
+      }
+
+      try {
+        await saveToAuth();
+      } catch (error) {
+        appendLog("Auth failed: " + (error.code || "") + " " + (error.message || error));
+      }
+
+      appendLog("انتهى التنفيذ");
+    });
+
+    document.getElementById("signinBtn").addEventListener("click", async () => {
+      appendLog("-----");
+      appendLog("بدأ تسجيل الدخول...");
+
+      try {
+        await signInUser();
+      } catch (error) {
+        appendLog("SignIn failed: " + (error.code || "") + " " + (error.message || error));
+      }
+
+      appendLog("انتهى تسجيل الدخول");
+    });
+  </script>
+</body>
+</html>
