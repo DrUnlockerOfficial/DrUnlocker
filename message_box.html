@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Message Box</title>
+  <style>
+    :root{
+      --bg: rgba(8, 8, 10, 0.42);
+      --panel: rgba(24, 24, 28, 0.72);
+      --panel-2: rgba(255, 255, 255, 0.04);
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #f4f4f5;
+      --muted: #b7b7bd;
+      --red: #e5484d;
+      --red-2: #ff6268;
+      --red-3: #b92f35;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
+    }
+
+    *{ box-sizing:border-box; }
+
+    html, body{
+      width:100%;
+      height:100%;
+      margin:0;
+      overflow:hidden;
+      background:transparent;
+      font-family:"Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+      color:var(--text);
+    }
+
+    .overlay{
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      background:var(--bg);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      padding:24px;
+    }
+
+    .overlay.show{
+      display:flex;
+    }
+
+    .box{
+      width:min(480px, 100%);
+      border-radius:28px;
+      background:linear-gradient(180deg, rgba(255,255,255,.06) 0%, rgba(255,255,255,.03) 100%);
+      border:1px solid var(--border);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+
+    .box::after{
+      content:"";
+      position:absolute;
+      inset:auto -80px -90px auto;
+      width:260px;
+      height:260px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(229,72,77,.18) 0%, rgba(229,72,77,0) 70%);
+      pointer-events:none;
+    }
+
+    .head{
+      padding:22px 22px 12px;
+      display:flex;
+      align-items:flex-start;
+      gap:14px;
+      position:relative;
+      z-index:1;
+    }
+
+    .icon{
+      width:48px;
+      height:48px;
+      border-radius:16px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-shrink:0;
+      background:linear-gradient(180deg, var(--red-2) 0%, var(--red-3) 100%);
+      box-shadow:0 12px 26px rgba(229,72,77,.22);
+      font-size:22px;
+      font-weight:900;
+      color:#fff;
+    }
+
+    .titles{
+      min-width:0;
+      flex:1;
+    }
+
+    .title{
+      margin:2px 0 6px;
+      font-size:22px;
+      line-height:1.2;
+      font-weight:900;
+      letter-spacing:-.2px;
+    }
+
+    .subtitle{
+      margin:0;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.7;
+    }
+
+    .body{
+      padding:0 22px 18px;
+      position:relative;
+      z-index:1;
+    }
+
+    .meta{
+      margin-bottom:12px;
+      padding:12px 14px;
+      border-radius:18px;
+      background:var(--panel-2);
+      border:1px solid rgba(255,255,255,.06);
+      color:#e4e4e7;
+      font-size:13px;
+      line-height:1.6;
+      word-break:break-word;
+      white-space:pre-wrap;
+    }
+
+    .message{
+      padding:16px;
+      border-radius:18px;
+      background:var(--panel-2);
+      border:1px solid rgba(255,255,255,.06);
+      color:var(--text);
+      font-size:14px;
+      line-height:1.8;
+      word-break:break-word;
+      white-space:pre-wrap;
+    }
+
+    .footer{
+      padding:0 22px 22px;
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      position:relative;
+      z-index:1;
+    }
+
+    .btn{
+      border:0;
+      border-radius:16px;
+      padding:12px 18px;
+      min-width:110px;
+      color:#fff;
+      font-size:14px;
+      font-weight:800;
+      cursor:pointer;
+      transition:transform .15s ease, filter .15s ease;
+    }
+
+    .btn:hover{
+      transform:translateY(-1px);
+      filter:brightness(1.06);
+    }
+
+    .btn.primary{
+      background:linear-gradient(180deg, var(--red-2) 0%, var(--red-3) 100%);
+      box-shadow:0 14px 30px rgba(229,72,77,.22);
+    }
+
+    .btn.secondary{
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.08);
+    }
+
+    .variant-info .icon{
+      background:linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
+      box-shadow:0 12px 26px rgba(59,130,246,.22);
+    }
+
+    .variant-success .icon{
+      background:linear-gradient(180deg, #22c55e 0%, #15803d 100%);
+      box-shadow:0 12px 26px rgba(34,197,94,.22);
+    }
+
+    .variant-warning .icon{
+      background:linear-gradient(180deg, #f59e0b 0%, #b45309 100%);
+      box-shadow:0 12px 26px rgba(245,158,11,.22);
+    }
+  </style>
+</head>
+<body>
+  <div id="overlay" class="overlay">
+    <div id="box" class="box variant-warning">
+      <div class="head">
+        <div id="icon" class="icon">!</div>
+        <div class="titles">
+          <h2 id="title" class="title">Message</h2>
+          <p id="subtitle" class="subtitle">Please review the following message.</p>
+        </div>
+      </div>
+
+      <div class="body">
+        <div id="meta" class="meta hidden"></div>
+        <div id="message" class="message"></div>
+      </div>
+
+      <div class="footer">
+        <button id="secondaryBtn" class="btn secondary hidden" type="button">Cancel</button>
+        <button id="primaryBtn" class="btn primary" type="button">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const overlay = document.getElementById("overlay");
+    const box = document.getElementById("box");
+    const icon = document.getElementById("icon");
+    const titleEl = document.getElementById("title");
+    const subtitleEl = document.getElementById("subtitle");
+    const metaEl = document.getElementById("meta");
+    const messageEl = document.getElementById("message");
+    const primaryBtn = document.getElementById("primaryBtn");
+    const secondaryBtn = document.getElementById("secondaryBtn");
+
+    let currentMode = "single";
+
+    function post(action) {
+      try {
+        window.parent.postMessage({ type: "MB_ACTION", action }, "*");
+      } catch {}
+    }
+
+    function closeBox(action = "close") {
+      overlay.classList.remove("show");
+      post(action);
+      try {
+        window.parent.postMessage({ type: "MB_CLOSED" }, "*");
+      } catch {}
+    }
+
+    function applyVariant(variant) {
+      box.classList.remove("variant-warning", "variant-info", "variant-success");
+      if (variant === "info") {
+        box.classList.add("variant-info");
+        icon.textContent = "i";
+      } else if (variant === "success") {
+        box.classList.add("variant-success");
+        icon.textContent = "✓";
+      } else {
+        box.classList.add("variant-warning");
+        icon.textContent = "!";
+      }
+    }
+
+    function openBox(payload = {}) {
+      titleEl.textContent = payload.title || "Message";
+      subtitleEl.textContent = payload.subtitle || "Please review the following message.";
+      messageEl.textContent = payload.message || "";
+      applyVariant(payload.variant || "warning");
+
+      if (payload.meta) {
+        metaEl.textContent = String(payload.meta);
+        metaEl.classList.remove("hidden");
+      } else {
+        metaEl.textContent = "";
+        metaEl.classList.add("hidden");
+      }
+
+      currentMode = payload.showActions ? "actions" : "single";
+
+      if (currentMode === "actions") {
+        primaryBtn.textContent = payload.primaryLabel || "OK";
+        secondaryBtn.textContent = payload.secondaryLabel || "Cancel";
+        secondaryBtn.classList.remove("hidden");
+      } else {
+        primaryBtn.textContent = payload.primaryLabel || "OK";
+        secondaryBtn.classList.add("hidden");
+      }
+
+      overlay.classList.add("show");
+    }
+
+    primaryBtn.addEventListener("click", () => {
+      if (currentMode === "actions") closeBox("primary");
+      else closeBox("close");
+    });
+
+    secondaryBtn.addEventListener("click", () => closeBox("secondary"));
+
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) closeBox("close");
+    });
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && overlay.classList.contains("show")) {
+        closeBox("close");
+      }
+    });
+
+    window.addEventListener("message", (event) => {
+      const data = event.data || {};
+      if (data.type === "MB_SHOW") openBox(data.payload || {});
+      if (data.type === "MB_HIDE") overlay.classList.remove("show");
+    });
+
+    window.addEventListener("load", () => {
+      try {
+        window.parent.postMessage({ type: "MB_READY" }, "*");
+      } catch {}
+    });
+  </script>
+</body>
+</html>
