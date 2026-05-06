@@ -1,0 +1,367 @@
+<!doctype html>    
+<html lang="ar">    
+<head>    
+  <meta charset="UTF-8" />    
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />    
+  <title>Firebase RTDB - Admin</title>    
+  <style>    
+    body{    
+      font-family: Arial, sans-serif;    
+      background:#f6f7fb;    
+      margin:0;    
+      padding:24px;    
+      direction: rtl;    
+    }    
+    
+    h2{    
+      margin-top:0;    
+    }    
+    
+    .card{    
+      background:#fff;    
+      border:1px solid #ddd;    
+      border-radius:12px;    
+      padding:16px;    
+      margin-bottom:16px;    
+      box-shadow:0 2px 8px rgba(0,0,0,0.04);    
+    }    
+    
+    label{    
+      display:block;    
+      margin-top:10px;    
+      margin-bottom:6px;    
+      font-weight:bold;    
+    }    
+    
+    select{    
+      width:100%;    
+      padding:10px 12px;    
+      border:1px solid #cbd5e1;    
+      border-radius:10px;    
+      font-size:15px;    
+      box-sizing:border-box;    
+      background:#fff;    
+    }    
+    
+    button{    
+      padding:10px 16px;    
+      margin-inline-end:8px;    
+      margin-top:12px;    
+      border:0;    
+      border-radius:10px;    
+      cursor:pointer;    
+      background:#2563eb;    
+      color:#fff;    
+      font-size:15px;    
+    }    
+    
+    button:hover{    
+      background:#1d4ed8;    
+    }    
+    
+    .row{    
+      display:grid;    
+      grid-template-columns: 1fr 1fr;    
+      gap:12px;    
+    }    
+    
+    .stat{    
+      font-size:16px;    
+      margin:6px 0;    
+    }    
+    
+    pre{    
+      background:#0f172a;    
+      color:#e2e8f0;    
+      padding:16px;    
+      border-radius:12px;    
+      overflow:auto;    
+      max-height:420px;    
+      white-space:pre-wrap;    
+      word-break:break-word;    
+    }    
+    
+    .hidden{    
+      display:none;    
+    }    
+    
+    @media (max-width: 720px){    
+      .row{    
+        grid-template-columns:1fr;    
+      }    
+    }    
+  </style>    
+</head>    
+<body>    
+  <h2>Admin Control</h2>    
+    
+  <div class="card">    
+    <label>المستخدم</label>    
+    <select id="userSelect">    
+      <option value="">جارِ تحميل المستخدمين...</option>    
+    </select>    
+    
+    <div class="row">    
+      <div>    
+        <label>Balance</label>    
+        <select id="balanceSelect">    
+          <option value="0">0</option>    
+          <option value="50">50</option>    
+          <option value="100">100</option>    
+          <option value="150">150</option>    
+          <option value="200">200</option>    
+          <option value="500">500</option>    
+          <option value="1000">1000</option>    
+        </select>    
+      </div>    
+    
+      <div>    
+        <label>Account Status</label>    
+        <select id="statusSelect">    
+          <option value="Idle">Idle</option>    
+          <option value="freezed">freezed</option>    
+          <option value="banned">banned</option>    
+        </select>    
+      </div>    
+    </div>    
+    
+    <div id="periodBlock">    
+      <div class="row">    
+        <div>    
+          <label>مدة التجميد - العدد</label>    
+          <select id="periodCount">    
+            <option value="1">1</option>    
+            <option value="2">2</option>    
+            <option value="3">3</option>    
+            <option value="4">4</option>    
+            <option value="5">5</option>    
+            <option value="6">6</option>    
+            <option value="7">7</option>    
+            <option value="8">8</option>    
+            <option value="9">9</option>    
+            <option value="10">10</option>    
+            <option value="11">11</option>    
+            <option value="12">12</option>    
+            <option value="13">13</option>    
+            <option value="14">14</option>    
+            <option value="15">15</option>    
+            <option value="16">16</option>    
+            <option value="17">17</option>    
+            <option value="18">18</option>    
+            <option value="19">19</option>    
+            <option value="20">20</option>    
+            <option value="21">21</option>    
+            <option value="22">22</option>    
+            <option value="23">23</option>    
+            <option value="24">24</option>    
+            <option value="25">25</option>    
+            <option value="26">26</option>    
+            <option value="27">27</option>    
+            <option value="28">28</option>    
+            <option value="29">29</option>    
+            <option value="30">30</option>    
+          </select>    
+        </div>    
+    
+        <div>    
+          <label>الوحدة</label>    
+          <select id="periodUnit">    
+            <option value="day">day</option>    
+            <option value="month">month</option>    
+            <option value="year">year</option>    
+          </select>    
+        </div>    
+      </div>    
+    </div>    
+    
+    <button id="saveBtn">حفظ التعديل</button>    
+    <button id="readBtn">قراءة users</button>    
+    
+    <div class="stat">عدد المستخدمين: <span id="usersCount">0</span></div>    
+    <div class="stat">المستخدم المختار: <span id="selectedUserLabel">-</span></div>    
+  </div>    
+    
+  <div class="card">    
+    <pre id="output">جاهز...</pre>    
+  </div>    
+    
+  <script type="module">    
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";    
+    import {    
+      getDatabase,    
+      ref,    
+      onValue,    
+      update,    
+      remove    
+    } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js";    
+    
+    const firebaseConfig = {    
+      apiKey: "AIzaSyCwAX2A35nYps1T4f30_lurNh_7SzL8by8",    
+      authDomain: "dr-unlocker.firebaseapp.com",    
+      projectId: "dr-unlocker",    
+      storageBucket: "dr-unlocker.firebasestorage.app",    
+      messagingSenderId: "783882145882",    
+      appId: "1:783882145882:web:64f34098b501f6e9da8863",    
+      measurementId: "G-HTC5C0F929",    
+      databaseURL: "https://dr-unlocker-default-rtdb.firebaseio.com/"    
+    };    
+    
+    const app = initializeApp(firebaseConfig);    
+    const db = getDatabase(app);    
+    
+    const usersRef = ref(db, "users");    
+    
+    const userSelect = document.getElementById("userSelect");    
+    const balanceSelect = document.getElementById("balanceSelect");    
+    const statusSelect = document.getElementById("statusSelect");    
+    const periodBlock = document.getElementById("periodBlock");    
+    const periodCount = document.getElementById("periodCount");    
+    const periodUnit = document.getElementById("periodUnit");    
+    const usersCount = document.getElementById("usersCount");    
+    const selectedUserLabel = document.getElementById("selectedUserLabel");    
+    const output = document.getElementById("output");    
+    
+    let usersCache = {};    
+    
+    function safeKey(key) {    
+      return String(key || "").trim().replace(/[.#$\[\]\/]/g, "_");    
+    }    
+    
+    function escapeHtml(text) {    
+      return String(text)    
+        .replaceAll("&", "&amp;")    
+        .replaceAll("<", "&lt;")    
+        .replaceAll(">", "&gt;")    
+        .replaceAll('"', "&quot;")    
+        .replaceAll("'", "&#039;");    
+    }    
+    
+    function buildPeriod(count, unit) {    
+      const n = Number(count) || 1;    
+      const plural = n === 1 ? unit : unit + "s";    
+      return `${n} ${plural}`;    
+    }    
+    
+    function parsePeriod(periodText) {    
+      const text = String(periodText || "").trim();    
+      const match = text.match(/^(\d+)\s+([a-zA-Z]+)s?$/);    
+    
+      if (!match) {    
+        return { count: "1", unit: "day" };    
+      }    
+    
+      const count = match[1];    
+      const unitRaw = match[2].toLowerCase();    
+    
+      if (unitRaw.startsWith("day")) return { count, unit: "day" };    
+      if (unitRaw.startsWith("month")) return { count, unit: "month" };    
+      if (unitRaw.startsWith("year")) return { count, unit: "year" };    
+    
+      return { count: "1", unit: "day" };    
+    }    
+    
+    function togglePeriodBlock() {    
+      periodBlock.classList.toggle("hidden", statusSelect.value !== "freezed");    
+    }    
+    
+    function renderUsersList(data) {    
+      const keys = Object.keys(data || {});    
+      usersCount.textContent = keys.length;    
+    
+      if (!keys.length) {    
+        userSelect.innerHTML = '<option value="">لا يوجد مستخدمين</option>';    
+        selectedUserLabel.textContent = "-";    
+        output.textContent = "No users found inside users";    
+        return;    
+      }    
+    
+      keys.sort((a, b) => a.localeCompare(b, "en"));    
+    
+      userSelect.innerHTML = keys.map((key) => {    
+        const user = data[key] || {};    
+        const balance = user.balance ?? 0;    
+        const status = user.accountStatus ?? "Idle";    
+        return `<option value="${escapeHtml(key)}">${escapeHtml(key)} | balance: ${escapeHtml(balance)} | status: ${escapeHtml(status)}</option>`;    
+      }).join("");    
+    
+      if (!userSelect.value) {    
+        userSelect.value = keys[0];    
+      }    
+    
+      syncControlsWithSelectedUser();    
+    }    
+    
+    function syncControlsWithSelectedUser() {    
+      const key = userSelect.value;    
+      selectedUserLabel.textContent = key || "-";    
+    
+      const user = usersCache[key];    
+      if (!user) return;    
+    
+      balanceSelect.value = String(user.balance ?? 0);    
+    
+      const currentStatus = user.accountStatus ?? "Idle";    
+      if (currentStatus === "banned" || currentStatus === "freezed" || currentStatus === "Idle") {    
+        statusSelect.value = currentStatus;    
+      } else {    
+        statusSelect.value = "Idle";    
+      }    
+    
+      const parsed = parsePeriod(user.period);    
+      periodCount.value = parsed.count;    
+      periodUnit.value = parsed.unit;    
+    
+      togglePeriodBlock();    
+      output.textContent = JSON.stringify(user, null, 2);    
+    }    
+    
+    onValue(usersRef, (snapshot) => {    
+      usersCache = snapshot.val() || {};    
+      renderUsersList(usersCache);    
+    }, (error) => {    
+      console.error(error);    
+      output.textContent = "Read failed: " + error.message;    
+    });    
+    
+    userSelect.addEventListener("change", syncControlsWithSelectedUser);    
+    statusSelect.addEventListener("change", togglePeriodBlock);    
+    
+    document.getElementById("saveBtn").addEventListener("click", async () => {    
+      const key = safeKey(userSelect.value);    
+      if (!key) {    
+        output.textContent = "اختر مستخدم أولًا";    
+        return;    
+      }    
+    
+      const status = statusSelect.value;    
+      const payload = {    
+        balance: Number(balanceSelect.value) || 0,    
+        accountStatus: status    
+      };    
+    
+      if (status === "freezed") {    
+        payload.period = buildPeriod(periodCount.value, periodUnit.value);    
+      } else {    
+        payload.period = null;    
+      }    
+    
+      try {    
+        await update(ref(db, "users/" + key), payload);    
+    
+        if (status !== "freezed") {    
+          await remove(ref(db, "users/" + key + "/period"));    
+        }    
+    
+        output.textContent = "تم حفظ التعديل داخل users/" + key;    
+      } catch (error) {    
+        console.error(error);    
+        output.textContent = "Save failed: " + error.message;    
+      }    
+    });    
+    
+    document.getElementById("readBtn").addEventListener("click", () => {    
+      output.textContent = JSON.stringify(usersCache, null, 2) || "No users found inside users";    
+    });    
+  </script>    
+</body>    
+</html>
