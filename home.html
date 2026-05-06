@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home</title>
+  <style>
+    :root{
+      --bg0:#070708;
+      --bg1:#0d0d10;
+      --panel:rgba(24,24,28,.72);
+      --border:rgba(255,255,255,.08);
+      --text:#f4f4f5;
+      --muted:#b7b7bd;
+      --accent:#e5484d;
+      --accent-2:#ff6268;
+      --accent-3:#b92f35;
+      --shadow:0 24px 70px rgba(0,0,0,.45);
+      --radius:22px;
+    }
+
+    *{ box-sizing:border-box; }
+
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:"Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(229,72,77,.18), transparent 28%),
+        radial-gradient(circle at top right, rgba(255,98,104,.08), transparent 18%),
+        radial-gradient(circle at bottom left, rgba(229,72,77,.08), transparent 24%),
+        linear-gradient(180deg, var(--bg1) 0%, var(--bg0) 100%);
+      direction:ltr;
+      padding:24px;
+    }
+
+    .page{
+      min-height:calc(100vh - 48px);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .card{
+      width:min(820px, 100%);
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:28px;
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding:28px;
+      overflow:hidden;
+      position:relative;
+    }
+
+    .card::after{
+      content:"";
+      position:absolute;
+      inset:auto -80px -100px auto;
+      width:300px;
+      height:300px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(229,72,77,.16) 0%, rgba(229,72,77,0) 70%);
+      pointer-events:none;
+    }
+
+    .top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:26px;
+      flex-wrap:wrap;
+      position:relative;
+      z-index:1;
+    }
+
+    .brand{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+
+    .eyebrow{
+      display:inline-flex;
+      width:max-content;
+      padding:8px 12px;
+      border-radius:999px;
+      background:rgba(229,72,77,.12);
+      border:1px solid rgba(229,72,77,.22);
+      color:#ffb6b9;
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.4px;
+      text-transform:uppercase;
+    }
+
+    h1{
+      margin:0;
+      font-size:34px;
+      letter-spacing:-.5px;
+      line-height:1.1;
+    }
+
+    .subtitle{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.7;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1.3fr .7fr;
+      gap:16px;
+      position:relative;
+      z-index:1;
+    }
+
+    .panel{
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:22px;
+      padding:20px;
+    }
+
+    .label{
+      color:var(--muted);
+      font-size:13px;
+      font-weight:700;
+      margin-bottom:8px;
+    }
+
+    .value{
+      font-size:18px;
+      font-weight:800;
+      line-height:1.5;
+      word-break:break-word;
+    }
+
+    .meta{
+      margin-top:18px;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+
+    .meta-box{
+      padding:16px;
+      border-radius:18px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.06);
+    }
+
+    .meta-title{
+      color:var(--muted);
+      font-size:12px;
+      font-weight:700;
+      margin-bottom:8px;
+      text-transform:uppercase;
+      letter-spacing:.3px;
+    }
+
+    .meta-value{
+      font-size:15px;
+      font-weight:700;
+      word-break:break-word;
+    }
+
+    .side{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .status{
+      padding:18px;
+      border-radius:20px;
+      background:linear-gradient(180deg, rgba(255,98,104,.12) 0%, rgba(185,47,53,.08) 100%);
+      border:1px solid rgba(229,72,77,.18);
+    }
+
+    .status strong{
+      display:block;
+      font-size:15px;
+      margin-bottom:8px;
+    }
+
+    .status span{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.7;
+    }
+
+    .btn{
+      width:100%;
+      border:0;
+      border-radius:16px;
+      padding:14px 16px;
+      background:linear-gradient(180deg, var(--accent-2) 0%, var(--accent-3) 100%);
+      color:#fff;
+      font-size:15px;
+      font-weight:800;
+      cursor:pointer;
+      box-shadow:0 14px 30px rgba(229,72,77,.22);
+      transition:transform .15s ease, filter .15s ease;
+    }
+
+    .btn:hover{
+      filter:brightness(1.06);
+      transform:translateY(-1px);
+    }
+
+    @media (max-width: 860px){
+      .grid{ grid-template-columns:1fr; }
+    }
+
+    @media (max-width: 720px){
+      body{
+        padding:16px;
+      }
+
+      .page{
+        min-height:calc(100vh - 32px);
+      }
+
+      .card{
+        padding:20px;
+        border-radius:24px;
+      }
+
+      h1{
+        font-size:28px;
+      }
+
+      .meta{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="card">
+      <div class="top">
+        <div class="brand">
+          <div class="eyebrow">DR • UNLOCKER</div>
+          <h1 id="welcomeTitle">Welcome</h1>
+          <p class="subtitle" id="welcomeSubtitle">Loading account information...</p>
+        </div>
+      </div>
+
+      <div class="grid">
+        <section class="panel">
+          <div class="label">Username</div>
+          <div class="value" id="usernameText">-</div>
+
+          <div class="meta">
+            <div class="meta-box">
+              <div class="meta-title">Email</div>
+              <div class="meta-value" id="emailText">-</div>
+            </div>
+
+            <div class="meta-box">
+              <div class="meta-title">UID</div>
+              <div class="meta-value" id="uidText">-</div>
+            </div>
+          </div>
+        </section>
+
+        <aside class="side">
+          <div class="status">
+            <strong>Session Active</strong>
+            <span>Your account stays signed in until you explicitly sign out.</span>
+          </div>
+
+          <button id="logoutBtn" class="btn" type="button">Sign Out</button>
+        </aside>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+    import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCwAX2A35nYps1T4f30_lurNh_7SzL8by8",
+      authDomain: "dr-unlocker.firebaseapp.com",
+      projectId: "dr-unlocker",
+      storageBucket: "dr-unlocker.firebasestorage.app",
+      messagingSenderId: "783882145882",
+      appId: "1:783882145882:web:64f34098b501f6e9da8863",
+      measurementId: "G-HTC5C0F929",
+      databaseURL: "https://dr-unlocker-default-rtdb.firebaseio.com/"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    const welcomeTitle = document.getElementById("welcomeTitle");
+    const welcomeSubtitle = document.getElementById("welcomeSubtitle");
+    const usernameText = document.getElementById("usernameText");
+    const emailText = document.getElementById("emailText");
+    const uidText = document.getElementById("uidText");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    await auth.authStateReady();
+
+    const user = auth.currentUser;
+
+    if (!user) {
+      welcomeTitle.textContent = "No active session";
+      welcomeSubtitle.textContent = "Open SignIn to continue.";
+      usernameText.textContent = "-";
+      emailText.textContent = "-";
+      uidText.textContent = "-";
+      logoutBtn.textContent = "Go to SignIn";
+      logoutBtn.addEventListener("click", () => {
+        window.location.replace("index.html");
+      });
+    } else {
+      const username = user.displayName || (user.email ? user.email.split("@")[0] : "-");
+      welcomeTitle.textContent = `Welcome, ${username}`;
+      welcomeSubtitle.textContent = "Your account is ready and your session is active.";
+      usernameText.textContent = username;
+      emailText.textContent = user.email || "-";
+      uidText.textContent = user.uid || "-";
+
+      logoutBtn.addEventListener("click", async () => {
+        await signOut(auth);
+        window.location.replace("index.html?logout=1");
+      });
+    }
+  </script>
+</body>
+</html>
