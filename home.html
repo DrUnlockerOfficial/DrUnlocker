@@ -1,0 +1,593 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home</title>
+  <style>
+    :root{
+      --bg0:#070708;
+      --bg1:#0d0d10;
+      --panel:rgba(24,24,28,.72);
+      --panel-2:rgba(255,255,255,.04);
+      --border:rgba(255,255,255,.08);
+      --text:#f4f4f5;
+      --muted:#b7b7bd;
+      --muted-2:#8d8d96;
+      --red:#e5484d;
+      --red-2:#ff6268;
+      --red-3:#b92f35;
+      --shadow:0 24px 70px rgba(0,0,0,.45);
+      --radius:22px;
+    }
+
+    *{ box-sizing:border-box; }
+
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:"Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(229,72,77,.18), transparent 28%),
+        radial-gradient(circle at top right, rgba(255,98,104,.08), transparent 18%),
+        radial-gradient(circle at bottom left, rgba(229,72,77,.08), transparent 24%),
+        linear-gradient(180deg, var(--bg1) 0%, var(--bg0) 100%);
+      direction:ltr;
+      padding:24px;
+      overflow-y:auto;
+    }
+
+    .page{
+      min-height:calc(100vh - 48px);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .card{
+      width:min(980px, 100%);
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:28px;
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding:22px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .card::after{
+      content:"";
+      position:absolute;
+      inset:auto -80px -100px auto;
+      width:300px;
+      height:300px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(229,72,77,.16) 0%, rgba(229,72,77,0) 70%);
+      pointer-events:none;
+    }
+
+    .nav-bar{
+      position:relative;
+      z-index:1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:16px;
+      flex-wrap:wrap;
+      margin-bottom:18px;
+      padding:14px;
+      border-radius:22px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.06);
+    }
+
+    .nav-links{
+      width:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .nav-btn{
+      appearance:none;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.04);
+      color:var(--muted);
+      border-radius:16px;
+      height:46px;
+      min-width:110px;
+      padding:0 18px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      font-size:14px;
+      font-weight:800;
+      line-height:1;
+      cursor:pointer;
+      transition:
+        transform .15s ease,
+        background .18s ease,
+        border-color .18s ease,
+        color .18s ease,
+        box-shadow .18s ease,
+        filter .18s ease;
+      text-decoration:none;
+    }
+
+    .nav-btn:hover{
+      transform:translateY(-1px);
+      background:rgba(229,72,77,.12);
+      border-color:rgba(229,72,77,.26);
+      color:#fff;
+      filter:brightness(1.04);
+    }
+
+    .nav-btn.active{
+      background:linear-gradient(180deg, var(--red-2) 0%, var(--red-3) 100%);
+      color:#fff;
+      border-color:rgba(229,72,77,.38);
+      box-shadow:0 12px 26px rgba(229,72,77,.22);
+    }
+
+    .content{
+      position:relative;
+      z-index:1;
+      display:grid;
+      grid-template-columns:1.3fr .7fr;
+      gap:16px;
+      min-height:0;
+    }
+
+    .panel{
+      background:var(--panel-2);
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:22px;
+      padding:20px;
+    }
+
+    .main-panel{
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      overflow:hidden;
+    }
+
+    .welcome-wrap{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+
+    h1{
+      margin:0;
+      font-size:34px;
+      letter-spacing:-.5px;
+      line-height:1.1;
+    }
+
+    .subtitle{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.7;
+    }
+
+    .label{
+      color:var(--muted);
+      font-size:13px;
+      font-weight:700;
+      margin-bottom:8px;
+    }
+
+    .value{
+      font-size:18px;
+      font-weight:800;
+      line-height:1.5;
+      word-break:break-word;
+    }
+
+    .meta{
+      margin-top:18px;
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:12px;
+    }
+
+    .meta-box{
+      padding:16px;
+      border-radius:18px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.06);
+    }
+
+    .meta-title{
+      color:var(--muted);
+      font-size:12px;
+      font-weight:700;
+      margin-bottom:8px;
+      text-transform:uppercase;
+      letter-spacing:.3px;
+    }
+
+    .meta-value{
+      font-size:15px;
+      font-weight:700;
+      word-break:break-word;
+    }
+
+    .side{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      overflow:hidden;
+    }
+
+    .status{
+      padding:18px;
+      border-radius:20px;
+      background:linear-gradient(180deg, rgba(255,98,104,.12) 0%, rgba(185,47,53,.08) 100%);
+      border:1px solid rgba(229,72,77,.18);
+    }
+
+    .status strong{
+      display:block;
+      font-size:15px;
+      margin-bottom:8px;
+    }
+
+    .status span{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.7;
+    }
+
+    .btn{
+      width:100%;
+      border:0;
+      border-radius:16px;
+      padding:14px 16px;
+      background:linear-gradient(180deg, var(--red-2) 0%, var(--red-3) 100%);
+      color:#fff;
+      font-size:15px;
+      font-weight:800;
+      cursor:pointer;
+      box-shadow:0 14px 30px rgba(229,72,77,.22);
+      transition:transform .15s ease, filter .15s ease;
+    }
+
+    .btn:hover{
+      filter:brightness(1.06);
+      transform:translateY(-1px);
+    }
+
+    .placeholder{
+      padding:18px;
+      border-radius:18px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.06);
+      color:var(--muted);
+      line-height:1.8;
+      font-size:14px;
+    }
+
+    .section-title{
+      margin:0 0 10px;
+      font-size:28px;
+      line-height:1.1;
+    }
+
+    #messageBoxFrame{
+      position:fixed;
+      inset:0;
+      width:100%;
+      height:100%;
+      border:0;
+      display:none;
+      z-index:9999;
+      background:transparent;
+    }
+
+    @media (max-width: 920px){
+      .content{ grid-template-columns:1fr; }
+    }
+
+    @media (max-width: 720px){
+      body{ padding:16px; }
+      .page{ align-items:flex-start; }
+      .card{
+        width:100%;
+        padding:14px;
+        border-radius:24px;
+      }
+      .nav-bar{ padding:12px; }
+      .nav-links{ gap:8px; }
+      .nav-btn{
+        height:44px;
+        min-width:0;
+        flex:1 1 calc(50% - 8px);
+        font-size:12px;
+        padding:0 10px;
+      }
+      h1{ font-size:26px; }
+      .meta{ grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+  <iframe id="messageBoxFrame" src="message_box.html"></iframe>
+
+  <div class="page">
+    <div class="card">
+      <header class="nav-bar">
+        <nav class="nav-links" aria-label="Home navigation">
+          <a class="nav-btn active" href="home.html">Home</a>
+          <a class="nav-btn" href="order.html">Order</a>
+          <a class="nav-btn" href="profile.html">Profile</a>
+          <a class="nav-btn" href="about.html">About</a>
+        </nav>
+      </header>
+
+      <main class="content">
+        <section class="panel main-panel">
+          <div class="welcome-wrap">
+            <h1 id="welcomeTitle">Welcome</h1>
+            <p class="subtitle" id="welcomeSubtitle">Loading account information...</p>
+          </div>
+
+          <div>
+            <div class="label" style="margin-top:18px;">Username</div>
+            <div class="value" id="usernameText">-</div>
+
+            <div class="meta">
+              <div class="meta-box">
+                <div class="meta-title">Email</div>
+                <div class="meta-value" id="emailText">-</div>
+              </div>
+
+              <div class="meta-box">
+                <div class="meta-title">UID</div>
+                <div class="meta-value" id="uidText">-</div>
+              </div>
+
+              <div class="meta-box">
+                <div class="meta-title">Balance</div>
+                <div class="meta-value" id="balanceText">-</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <aside class="side">
+          <div class="status">
+            <strong>Session Active</strong>
+            <span>Your account stays signed in until you explicitly sign out.</span>
+          </div>
+
+          <button id="logoutBtn" class="btn" type="button">Sign Out</button>
+        </aside>
+      </main>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+    import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCwAX2A35nYps1T4f30_lurNh_7SzL8by8",
+      authDomain: "dr-unlocker.firebaseapp.com",
+      projectId: "dr-unlocker",
+      storageBucket: "dr-unlocker.firebasestorage.app",
+      messagingSenderId: "783882145882",
+      appId: "1:783882145882:web:64f34098b501f6e9da8863",
+      measurementId: "G-HTC5C0F929",
+      databaseURL: "https://dr-unlocker-default-rtdb.firebaseio.com/"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    const messageBoxFrame = document.getElementById("messageBoxFrame");
+
+    function showMessageBox(message, title = "Message", variant = "warning", subtitle = "Please review the following message.") {
+      if (!messageBoxFrame || !messageBoxFrame.contentWindow) return;
+      messageBoxFrame.style.display = "block";
+      messageBoxFrame.contentWindow.postMessage({
+        type: "MB_SHOW",
+        payload: { title, message, subtitle, variant }
+      }, "*");
+    }
+
+    window.addEventListener("message", (event) => {
+      if (event.data && event.data.type === "MB_CLOSED") {
+        if (messageBoxFrame) {
+          messageBoxFrame.style.display = "none";
+        }
+      }
+    });
+
+    const welcomeTitle = document.getElementById("welcomeTitle");
+    const welcomeSubtitle = document.getElementById("welcomeSubtitle");
+    const usernameText = document.getElementById("usernameText");
+    const emailText = document.getElementById("emailText");
+    const uidText = document.getElementById("uidText");
+    const balanceText = document.getElementById("balanceText");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    function normalizeEmail(value) {
+      return String(value || "").trim().toLowerCase();
+    }
+
+    function normalizeStatus(value) {
+      return String(value || "").trim().toLowerCase();
+    }
+
+    function addDuration(baseMs, amount, unit) {
+      const ms = {
+        minute: 60 * 1000,
+        minutes: 60 * 1000,
+        min: 60 * 1000,
+        mins: 60 * 1000,
+        hour: 60 * 60 * 1000,
+        hours: 60 * 60 * 1000,
+        day: 24 * 60 * 60 * 1000,
+        days: 24 * 60 * 60 * 1000,
+        month: 30 * 24 * 60 * 60 * 1000,
+        months: 30 * 24 * 60 * 60 * 1000,
+        year: 365 * 24 * 60 * 60 * 1000,
+        years: 365 * 24 * 60 * 60 * 1000
+      };
+      return baseMs + (Number(amount) || 0) * (ms[unit] || 0);
+    }
+
+    function parsePeriod(period, frozenAt) {
+      if (!period) return null;
+
+      if (typeof period === "number") {
+        return addDuration(frozenAt, period, "days");
+      }
+
+      if (typeof period === "string") {
+        const text = period.trim().toLowerCase();
+        const match = text.match(/^(\d+(?:\.\d+)?)\s*(minute|minutes|min|mins|hour|hours|day|days|month|months|year|years)$/i);
+        if (match) {
+          return addDuration(frozenAt, Number(match[1]), match[2].toLowerCase());
+        }
+        return null;
+      }
+
+      if (typeof period === "object") {
+        const amount = Number(period.value ?? period.amount ?? period.number);
+        const unit = String(period.unit ?? period.type ?? "days").toLowerCase();
+        if (!Number.isFinite(amount)) return null;
+        return addDuration(frozenAt, amount, unit);
+      }
+
+      return null;
+    }
+
+    function formatPeriodLabel(period) {
+      if (!period) return "";
+      if (typeof period === "number") return `${period} day${period === 1 ? "" : "s"}`;
+      if (typeof period === "string") return period.trim();
+      if (typeof period === "object") {
+        const value = period.value ?? period.amount ?? period.number;
+        const unit = String(period.unit ?? period.type ?? "days").toLowerCase();
+        if (value == null || value === "") return "";
+        return `${value} ${unit}`;
+      }
+      return "";
+    }
+
+    function getFreezeUntil(user) {
+      if (!user) return null;
+      if (user.freezeUntil) {
+        const ts = Number(user.freezeUntil);
+        if (Number.isFinite(ts)) return ts;
+      }
+      const frozenAt = Number(user.frozenAt || user.freezeStartedAt || 0);
+      if (!frozenAt) return null;
+      return parsePeriod(user.period, frozenAt);
+    }
+
+    function getFreezeMessage(user) {
+      const duration = formatPeriodLabel(user?.period || user?.freezeDuration || user?.freezePeriod);
+      if (duration) {
+        return `Your account is frozen for ${duration}.`;
+      }
+      const freezeUntil = getFreezeUntil(user);
+      if (freezeUntil) {
+        return `Your account is frozen for the specified duration.\nUnlock time: ${new Date(freezeUntil).toLocaleString("en-US")}.`;
+      }
+      return `Your account is frozen for the specified duration.`;
+    }
+
+    function checkAccountStatus(user) {
+      const status = normalizeStatus(user?.accountStatus);
+
+      if (status === "banned") {
+        return { allowed: false, message: "Your account is banned." };
+      }
+
+      if (status === "freezed") {
+        const freezeUntil = getFreezeUntil(user);
+
+        if (Date.now() < freezeUntil) {
+          return {
+            allowed: false,
+            message: getFreezeMessage(user)
+          };
+        }
+      }
+
+      return { allowed: true, message: "" };
+    }
+
+    async function getUserRecordByEmail(email) {
+      const normalized = normalizeEmail(email);
+      if (!normalized) return null;
+
+      const snap = await get(ref(db, "users"));
+      const users = snap.val() || {};
+
+      for (const key of Object.keys(users)) {
+        const user = users[key];
+        if (normalizeEmail(user?.email) === normalized) {
+          return { key, ...user };
+        }
+      }
+
+      return null;
+    }
+
+    await auth.authStateReady();
+
+    const user = auth.currentUser;
+
+    if (!user) {
+      welcomeTitle.textContent = "No active session";
+      welcomeSubtitle.textContent = "Open SignIn to continue.";
+      usernameText.textContent = "-";
+      emailText.textContent = "-";
+      uidText.textContent = "-";
+      balanceText.textContent = "-";
+      logoutBtn.textContent = "Go to SignIn";
+      logoutBtn.addEventListener("click", () => {
+        window.location.replace("index.html");
+      });
+    } else {
+      const record = await getUserRecordByEmail(user.email);
+      const gate = checkAccountStatus(record);
+
+      if (!gate.allowed) {
+        await signOut(auth);
+        showMessageBox(gate.message, "Access denied", "warning");
+        window.location.replace("index.html?logout=1");
+      } else {
+        const username = user.displayName || (user.email ? user.email.split("@")[0] : "-");
+        const balance = record && record.balance != null ? record.balance : 0;
+
+        welcomeTitle.textContent = `Welcome, ${username}`;
+        welcomeSubtitle.textContent = "Your account is ready and your session is active.";
+        usernameText.textContent = username;
+        emailText.textContent = user.email || "-";
+        uidText.textContent = user.uid || "-";
+        balanceText.textContent = Number(balance).toLocaleString("en-US", { maximumFractionDigits: 2 });
+
+        logoutBtn.addEventListener("click", async () => {
+          await signOut(auth);
+          window.location.replace("index.html?logout=1");
+        });
+      }
+    }
+  </script>
+</body>
+</html>
