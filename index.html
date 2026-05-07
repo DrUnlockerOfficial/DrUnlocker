@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dr Unlocker</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <iframe id="messageBoxFrame" src="message_box.html"></iframe>
+
+  <div class="page">
+    <div class="hero">
+      <section class="hero-card hero-copy">
+        <div>
+          <div class="eyebrow">DR • UNLOCKER</div>
+
+          <div class="feature-grid">
+            <div class="feature">
+              <p class="title">500K+ Unlocked device</p>
+              <p class="desc">A broad record of devices handled across different environments and systems.</p>
+            </div>
+            <div class="feature">
+              <p class="title">Success rates 99.2%</p>
+              <p class="desc">A high success rate built on a structured workflow and stable operation.</p>
+            </div>
+            <div class="feature">
+              <p class="title">Reliable and guaranteed transaction</p>
+              <p class="desc">Trusted transactions with clear steps for consistent service and easy follow up.</p>
+            </div>
+            <div class="feature">
+              <p class="title">All types of operating systems</p>
+              <p class="desc">Flexible support for multiple operating environments with room for growth.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="hero-card panel-wrap">
+        <div class="auth-panel">
+          <div class="tabs">
+            <button id="tabSignin" class="tab-btn active" type="button">SignIn</button>
+            <button id="tabSignup" class="tab-btn" type="button">Signup</button>
+          </div>
+
+          <div id="signinView">
+            <div class="section-title">Welcome back</div>
+            <div class="section-subtitle">Enter your credentials to access your account and continue to the main page.</div>
+
+            <div class="field">
+              <label>Email Address</label>
+              <input id="signinEmail" placeholder="name@example.com" />
+            </div>
+
+            <div class="field">
+              <label>Password</label>
+              <input id="signinPassword" type="password" placeholder="Enter your password" />
+            </div>
+
+            <button id="signinBtn" class="action-btn" type="button">Sign In</button>
+            <button id="goSignupBtn" class="secondary-btn" type="button">Create new account</button>
+          </div>
+
+          <div id="signupView" class="hidden">
+            <div class="section-title">Create account</div>
+            <div class="section-subtitle">Enter your name, username, email and password.</div>
+
+            <div class="field">
+              <label>Full Name</label>
+              <input id="userKey" placeholder="Enter full name" />
+            </div>
+
+            <div class="field">
+              <label>Username</label>
+              <input id="username" placeholder="Generated automatically" readonly />
+            </div>
+
+            <div class="field">
+              <label>Email Address</label>
+              <input id="email" placeholder="name@example.com" />
+            </div>
+
+            <div class="field">
+              <label>Password</label>
+              <input id="password" type="password" placeholder="Create a password" />
+            </div>
+
+            <button id="saveAllBtn" class="action-btn" type="button">Create account</button>
+            <button id="goSigninBtn" class="secondary-btn" type="button">Already have an account</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+    import { getDatabase, ref, set, get, push } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js";
+    import {
+      getAuth,
+      setPersistence,
+      browserLocalPersistence,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      fetchSignInMethodsForEmail,
+      updateProfile,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCwAX2A35nYps1T4f30_lurNh_7SzL8by8",
+      authDomain: "dr-unlocker.firebaseapp.com",
+      projectId: "dr-unlocker",
+      storageBucket: "dr-unlocker.firebasestorage.app",
+      messagingSenderId: "783882145882",
+      appId: "1:783882145882:web:64f34098b501f6e9da8863",
+      measurementId: "G-HTC5C0F929",
+      databaseURL: "https://dr-unlocker-default-rtdb.firebaseio.com/"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth(app);
+
+    await setPersistence(auth, browserLocalPersistence);
+
+    const messageBoxFrame = document.getElementById("messageBoxFrame");
+    function showMessageBox(message, title = "Message", variant = "warning", subtitle = "Please review the following message.") {
+      if (!messageBoxFrame || !messageBoxFrame.contentWindow) return;
+      messageBoxFrame.style.display = "block";
+      messageBoxFrame.contentWindow.postMessage({
+        type: "MB_SHOW",
+        payload: { title, message, subtitle, variant }
+      }, "*");
+    }
+
+    window.addEventListener("message", (event) => {
+      if (event.data && event.data.type === "MB_CLOSED") {
+        messageBoxFrame.style.display = "none";
+      }
+    });
+
+    function normalizeUsername(name) {
+      return String(name || "").trim().toLowerCase().replace(/\s+/g, "");
+    }
+
+    function normalizeEmail(email) {
+      return String(email || "").trim().toLowerCase();
+    }
+
+    function normalizeStatus(value) {
+      return String(value || "").trim().toLowerCase();
+    }
+
+    function addDuration(baseMs, amount, unit) {
+      const ms = {
+        minute: 60 * 1000, minutes: 60 * 1000, min: 60 * 1000, mins: 60 * 1000,
+        hour: 60 * 60 * 1000, hours: 60 * 60 * 1000,
+        day: 24 * 60 * 60 * 1000, days: 24 * 60 * 60 * 1000,
+        month: 30 * 24 * 60 * 60 * 1000, months: 30 * 24 * 60 * 60 * 1000,
+        year: 365 * 24 * 60 * 60 * 1000, years: 365 * 24 * 60 * 60 * 1000
+      };
+      return baseMs + (Number(amount) || 0) * (ms[unit] || 0);
+    }
+
+    function parsePeriod(period, frozenAt) {
+      if (!period) return null;
+
+      if (typeof period === "number") {
+        return addDuration(frozenAt, period, "days");
+      }
+
+      if (typeof period === "string") {
+        const text = period.trim().toLowerCase();
+        const match = text.match(/^(\d+(?:\.\d+)?)\s*(minute|minutes|min|mins|hour|hours|day|days|month|months|year|years)$/i);
+        if (match) return addDuration(frozenAt, Number(match[1]), match[2].toLowerCase());
+        return null;
+      }
+
+      if (typeof period === "object") {
+        const amount = Number(period.value ?? period.amount ?? period.number);
+        const unit = String(period.unit ?? period.type ?? "days").toLowerCase();
+        if (!Number.isFinite(amount)) return null;
+        return addDuration(frozenAt, amount, unit);
+      }
+
+      return null;
+    }
+
+    function formatPeriodLabel(period) {
+      if (!period) return "";
+      if (typeof period === "number") return `${period} day${period === 1 ? "" : "s"}`;
+      if (typeof period === "string") return period.trim();
+      if (typeof period === "object") {
+        const value = period.value ?? period.amount ?? period.number;
+        const unit = String(period.unit ?? period.type ?? "days").toLowerCase();
+        if (value == null || value === "") return "";
+        return `${value} ${unit}`;
+      }
+      return "";
+    }
+
+    function getFreezeUntil(user) {
+      if (!user) return null;
+      if (user.freezeUntil) {
+        const ts = Number(user.freezeUntil);
+        if (Number.isFinite(ts)) return ts;
+      }
+      const frozenAt = Number(user.frozenAt || user.freezeStartedAt || 0);
+      if (!frozenAt) return null;
+      return parsePeriod(user.period, frozenAt);
+    }
+
+    function getFreezeMessage(user) {
+      const duration = formatPeriodLabel(user?.period || user?.freezeDuration || user?.freezePeriod);
+      const freezeUntil = getFreezeUntil(user);
+
+      if (duration) {
+        if (freezeUntil) return `Your account is frozen for ${duration}.\nUnlock time: ${new Date(freezeUntil).toLocaleString("en-US")}.`;
+        return `Your account is frozen for ${duration}.`;
+      }
+
+      if (freezeUntil) {
+        return `Your account is frozen for the specified duration.\nUnlock time: ${new Date(freezeUntil).toLocaleString("en-US")}.`;
+      }
+
+      return `Your account is frozen for the specified duration.`;
+    }
+
+    function checkAccountStatus(user) {
+      const status = normalizeStatus(user?.accountStatus);
+
+      if (status === "banned") {
+        return { allowed: false, message: "Your account is banned." };
+      }
+
+      if (status === "freezed") {
+        return { allowed: false, message: getFreezeMessage(user) };
+      }
+
+      return { allowed: true, message: "" };
+    }
+
+    async function getUserRecordByEmail(email) {
+      const normalized = normalizeEmail(email);
+      if (!normalized) return null;
+
+      const snap = await get(ref(db, "users"));
+      const users = snap.val() || {};
+
+      for (const key of Object.keys(users)) {
+        const user = users[key];
+        if (normalizeEmail(user?.email) === normalized) {
+          return { key, ...user };
+        }
+      }
+
+      return null;
+    }
+
+    const url = new URL(window.location.href);
+    const skipAutoRedirect = url.searchParams.get("logout") === "1";
+
+    if (skipAutoRedirect) {
+      url.searchParams.delete("logout");
+      history.replaceState({}, "", url.pathname);
+    } else {
+      await auth.authStateReady();
+      const current = auth.currentUser;
+
+      if (current) {
+        const record = await getUserRecordByEmail(current.email);
+        const gate = checkAccountStatus(record);
+
+        if (gate.allowed) {
+          window.location.replace("main.html");
+        } else {
+          await signOut(auth);
+          showMessageBox(gate.message, "Access denied", "warning");
+        }
+      }
+    }
+
+    const userKeyInput = document.getElementById("userKey");
+    const usernameInput = document.getElementById("username");
+    const emailInput = document.getElementById("email");
+
+    let usernameCheckToken = 0;
+    let emailCheckToken = 0;
+
+    function getSignupData() {
+      const fullName = userKeyInput.value.trim();
+      const username = normalizeUsername(fullName);
+      const email = normalizeEmail(emailInput.value);
+
+      return {
+        fullName,
+        username,
+        email,
+        password: document.getElementById("password").value,
+        accountStatus: "Idle"
+      };
+    }
+
+    function getSigninData() {
+      return {
+        email: document.getElementById("signinEmail").value.trim(),
+        password: document.getElementById("signinPassword").value
+      };
+    }
+
+    async function buildUniqueUsername(baseUsername) {
+      const snap = await get(ref(db, "users"));
+      const users = snap.val() || {};
+      const taken = new Set(
+        Object.values(users).map(user => String(user?.username || "").toLowerCase()).filter(Boolean)
+      );
+
+      let candidate = baseUsername || "user";
+      let counter = 2;
+
+      while (taken.has(candidate)) {
+        candidate = `${baseUsername || "user"}${counter}`;
+        counter += 1;
+      }
+
+      return candidate;
+    }
+
+    async function emailExistsInRTDB(email) {
+      const normalized = normalizeEmail(email);
+      if (!normalized) return false;
+
+      const snap = await get(ref(db, "users"));
+      const users = snap.val() || {};
+      return Object.values(users).some(user => normalizeEmail(user?.email || "") === normalized);
+    }
+
+    async function updateUsernameField() {
+      const token = ++usernameCheckToken;
+      const baseUsername = normalizeUsername(userKeyInput.value);
+      usernameInput.value = baseUsername;
+
+      if (!baseUsername) return;
+
+      try {
+        const uniqueUsername = await buildUniqueUsername(baseUsername);
+        if (token !== usernameCheckToken) return;
+        usernameInput.value = uniqueUsername;
+      } catch {
+        if (token !== usernameCheckToken) return;
+        usernameInput.value = baseUsername;
+      }
+    }
+
+    async function updateEmailFieldValidity() {
+      const token = ++emailCheckToken;
+      const email = normalizeEmail(emailInput.value);
+
+      emailInput.setCustomValidity("");
+      if (!email) return;
+
+      try {
+        const exists = await emailExistsInRTDB(email);
+        if (token !== emailCheckToken) return;
+        if (exists) {
+          emailInput.setCustomValidity("This email is already used in the database");
+        }
+      } catch {
+        if (token !== emailCheckToken) return;
+      }
+    }
+
+    userKeyInput.addEventListener("input", updateUsernameField);
+    emailInput.addEventListener("input", updateEmailFieldValidity);
+    updateUsernameField();
+    updateEmailFieldValidity();
+
+    const signinView = document.getElementById("signinView");
+    const signupView = document.getElementById("signupView");
+    const tabSignin = document.getElementById("tabSignin");
+    const tabSignup = document.getElementById("tabSignup");
+    const signinBtn = document.getElementById("signinBtn");
+    const saveAllBtn = document.getElementById("saveAllBtn");
+    const goSignupBtn = document.getElementById("goSignupBtn");
+    const goSigninBtn = document.getElementById("goSigninBtn");
+
+    function showSignin() {
+      signinView.classList.remove("hidden");
+      signupView.classList.add("hidden");
+      tabSignin.classList.add("active");
+      tabSignup.classList.remove("active");
+    }
+
+    function showSignup() {
+      signinView.classList.add("hidden");
+      signupView.classList.remove("hidden");
+      tabSignin.classList.remove("active");
+      tabSignup.classList.add("active");
+    }
+
+    tabSignin.addEventListener("click", showSignin);
+    tabSignup.addEventListener("click", showSignup);
+    goSignupBtn.addEventListener("click", showSignup);
+    goSigninBtn.addEventListener("click", showSignin);
+
+    async function saveToRealtimeDatabase() {
+      const { fullName, username, email, accountStatus } = getSignupData();
+
+      if (!fullName) throw new Error("Full Name is empty");
+      if (!email) throw new Error("Email Address is empty");
+
+      const emailTaken = await emailExistsInRTDB(email);
+      if (emailTaken) {
+        emailInput.reportValidity();
+        throw new Error("This email is already used in the database");
+      }
+
+      const uniqueUsername = await buildUniqueUsername(username);
+      usernameInput.value = uniqueUsername;
+
+      const newUserRef = push(ref(db, "users"));
+      await set(newUserRef, {
+        fullName,
+        username: uniqueUsername,
+        email,
+        balance: 0,
+        registeredAt: new Date().toLocaleString("en-US", { dateStyle: "full", timeStyle: "medium" }),
+        accountStatus
+      });
+    }
+
+    async function saveToAuth() {
+      const { username, email, password } = getSignupData();
+
+      if (!email || !password) {
+        throw new Error("Email and Password are required for Auth");
+      }
+
+      const methods = await fetchSignInMethodsForEmail(auth, email);
+      if (methods.length > 0) {
+        throw new Error("This email is already used in Auth");
+      }
+
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      await updateProfile(cred.user, {
+        displayName: username || email.split("@")[0]
+      });
+
+      window.location.replace("main.html");
+    }
+
+    async function signInUser() {
+      const { email, password } = getSigninData();
+
+      if (!email || !password) {
+        throw new Error("Email and Password are required for SignIn");
+      }
+
+      const cred = await signInWithEmailAndPassword(auth, email, password);
+      const userRecord = await getUserRecordByEmail(cred.user.email);
+      const gate = checkAccountStatus(userRecord);
+
+      if (!gate.allowed) {
+        await signOut(auth);
+        showMessageBox(gate.message, "Access denied", "warning");
+        return;
+      }
+
+      window.location.replace("main.html");
+    }
+
+    saveAllBtn.addEventListener("click", async () => {
+      try {
+        await saveToRealtimeDatabase();
+      } catch (error) {
+        showMessageBox(error.message || String(error), "RTDB failed", "warning");
+        return;
+      }
+
+      try {
+        await saveToAuth();
+      } catch (error) {
+        showMessageBox(error.message || String(error), "Auth failed", "warning");
+      }
+    });
+
+    signinBtn.addEventListener("click", async () => {
+      try {
+        await signInUser();
+      } catch (error) {
+        showMessageBox(error.message || String(error), "SignIn failed", "warning");
+      }
+    });
+  </script>
+</body>
+</html>
