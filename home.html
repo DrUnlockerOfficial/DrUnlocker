@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body data-page="home">
+  <iframe id="messageBoxFrame" src="message_box.html"></iframe>
+
+  <div class="page">
+    <div class="card">
+      <header class="nav-bar">
+        <nav class="nav-links" aria-label="Home navigation">
+          <a class="nav-btn" data-page="home" href="home.html">Home</a>
+          <a class="nav-btn" data-page="order" href="order.html">Order</a>
+          <a class="nav-btn" data-page="profile" href="profile.html">Profile</a>
+          <a class="nav-btn" data-page="about" href="about.html">About</a>
+        </nav>
+      </header>
+
+      <main class="content one-col">
+
+        <section class="panel main-panel">
+          <div class="welcome-wrap">
+            <h1 id="welcomeTitle">Welcome</h1>
+            <p class="subtitle" id="welcomeSubtitle">Loading account information...</p>
+          </div>
+
+          <div>
+            <div class="label" style="margin-top:18px;">Balance</div>
+            <div class="value" id="balanceText">-</div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
