@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Message Box</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="overlay" class="message-overlay">
+    <div id="box" class="message-box message-warning">
+      <div class="message-head">
+        <div id="icon" class="message-icon">⚠</div>
+        <div class="message-titles">
+          <h2 id="title" class="message-title">Message</h2>
+          <p id="subtitle" class="message-subtitle">Please review the following message.</p>
+        </div>
+      </div>
+
+      <div class="message-body">
+        <div id="message" class="message-text"></div>
+      </div>
+
+      <div class="message-footer">
+        <button id="okBtn" class="message-btn" type="button">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const overlay = document.getElementById("overlay");
+    const box = document.getElementById("box");
+    const icon = document.getElementById("icon");
+    const titleEl = document.getElementById("title");
+    const subtitleEl = document.getElementById("subtitle");
+    const messageEl = document.getElementById("message");
+    const okBtn = document.getElementById("okBtn");
+
+    let onCloseCallback = null;
+
+    function applyVariant(variant) {
+      box.classList.remove("message-warning", "message-info", "message-success");
+
+      if (variant === "info") {
+        box.classList.add("message-info");
+        icon.textContent = "i";
+      } else if (variant === "success") {
+        box.classList.add("message-success");
+        icon.textContent = "✓";
+      } else {
+        box.classList.add("message-warning");
+        icon.textContent = "⚠";
+      }
+    }
+
+    function closeBox() {
+      overlay.classList.remove("show");
+
+      if (typeof onCloseCallback === "function") {
+        onCloseCallback();
+      }
+
+      onCloseCallback = null;
+
+      try {
+        window.parent.postMessage({ type: "MB_CLOSED" }, "*");
+      } catch {}
+    }
+
+    function openBox(payload = {}) {
+      const title = payload.title || "Message";
+      const message = payload.message || "";
+      const subtitle = payload.subtitle || "Please review the following message.";
+      const variant = payload.variant || "warning";
+      const callback = typeof payload.onClose === "function" ? payload.onClose : null;
+
+      titleEl.textContent = title;
+      subtitleEl.textContent = subtitle;
+      messageEl.textContent = message;
+      applyVariant(variant);
+      onCloseCallback = callback;
+
+      overlay.classList.add("show");
+    }
+
+    okBtn.addEventListener("click", closeBox);
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) closeBox();
+    });
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && overlay.classList.contains("show")) {
+        closeBox();
+      }
+    });
+
+    window.showMessageBox = openBox;
+
+    window.addEventListener("message", (event) => {
+      const data = event.data || {};
+      if (data.type === "MB_SHOW") openBox(data.payload || data);
+      if (data.type === "MB_HIDE") closeBox();
+    });
+
+    try {
+      window.parent.postMessage({ type: "MB_READY" }, "*");
+    } catch {}
+  </script>
+</body>
+</html>
